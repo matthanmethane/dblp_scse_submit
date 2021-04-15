@@ -18,7 +18,8 @@ import itertools
 import operator
 WINDOW_SIZE = "300x900"
 BTN_WIDTH = "300"
-BTN_HEIGHT = "10"
+BTN_HEIGHT = "8"
+BTN_HEIGHT_HALF = "4"
 BG_COLOR = "#BDBDBD"
 
 window = tk.Tk()
@@ -84,22 +85,32 @@ def network_scse():
     network_gui.geometry(WINDOW_SIZE)
     nodes = ret_nodes()
     G = ret_graph_cent()
-    
+
     def get_degree_histogram(dummy):
         degree_histogram(G)
     def get_degree_histogram_loglog(dummy):
         degree_histogram_loglog(G)
     def get_yr_network(dummy):
         for i in range(2000,2022,1):
-            G = ret_graph_network_year(yr_input = i)
+            G = ret_graph_network_year(yr_input = i, mode_input = mode.get())
             plt.subplot(6,4,i-1999)
             plt.gca().set_title(f'Year {i}')
             nx.draw(G,node_size =5)
         plt.show()
+    mode=tk.StringVar()
+    def change_mode(dummy):
+        if mode.get()=="all":
+            mode.set("connected")
+        else:
+            if mode.get()=="connected":
+                mode.set("giant")
+            else:
+                mode.set("all")
     def get_yr_df(dummy):
-        df = get_properties_yearly(nodes)
+        df = get_properties_yearly(nodes, mode_input = mode.get())
         df_dif = yearly_diff(df,N=1)
         show(df_dif)
+
     get_prob_btn = tk.Button(network_gui, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH, text ="Network and its Degree Distbution ", command = lambda: get_degree_histogram("dummy"))
     get_prob_btn.pack(side='top')
     get_prob_btn = tk.Button(network_gui, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH, text ="Network's LogLog Degree Distbution ", command = lambda: get_degree_histogram_loglog("dummy"))
@@ -108,6 +119,11 @@ def network_scse():
     get_yr_network_btn.pack(side='top')
     get_yr_df_btn = tk.Button(network_gui, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH, text ="Network Property in Yearly Granularity", command = lambda: get_yr_df("dummy"))
     get_yr_df_btn.pack(side='top')
+    mode_lbl = tk.Label(network_gui, height = BTN_HEIGHT_HALF, width = BTN_WIDTH,text = "current mode:", textvariable=mode)
+    mode.set("all")
+    mode_lbl.pack(side='top')
+    change_mode_btn = tk.Button(network_gui, bg=BG_COLOR,height = BTN_HEIGHT_HALF, width = BTN_WIDTH, text = "Change Mode", command = lambda: change_mode("dummy"))
+    change_mode_btn.pack(side='top')
     tk.Button(network_gui, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text="Back", command = network_gui.destroy).pack(side='bottom')
 
 #Collaboration functions here

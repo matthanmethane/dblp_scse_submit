@@ -172,9 +172,9 @@ def find_name_with_pid(pid,faculty_path):
             return faculty.name
 
 # Find "Position" (rank) using pid
-def find_pos_with_pid(pid):
+def find_pos_with_pid(pid,faculty_path):
     pos_list = []
-    data = pd.read_excel('Faculty.xlsx')
+    data = pd.read_excel(faculty_path)
     df = pd.DataFrame(data, columns=["Faculty","Position","Gender","Management","Area"])
     file = open("pid.txt","r")
     pid_list = file.readlines()
@@ -188,9 +188,9 @@ def find_pos_with_pid(pid):
             return pos.name
 
 # Find "Management" (or not) using pid
-def find_man_with_pid(pid):
+def find_man_with_pid(pid,faculty_path):
     man_list = []
-    data = pd.read_excel('Faculty.xlsx')
+    data = pd.read_excel(faculty_path)
     df = pd.DataFrame(data, columns=["Faculty","Position","Gender","Management","Area"])
     file = open("pid.txt","r")
     pid_list = file.readlines()
@@ -204,9 +204,9 @@ def find_man_with_pid(pid):
             return man.name
 
 # Find "Area" using pid
-def find_area_with_pid(pid):
+def find_area_with_pid(pid,faculty_path):
     area_list = []
-    data = pd.read_excel('Faculty.xlsx')
+    data = pd.read_excel(faculty_path)
     df = pd.DataFrame(data, columns=["Faculty","Position","Gender","Management","Area"])
     file = open("pid.txt","r")
     pid_list = file.readlines()
@@ -219,9 +219,9 @@ def find_area_with_pid(pid):
         if(area.pid == pid):
             return area.name
             
-def get_coworker_dict():
+def get_coworker_dict(faculty_path):
     faculty_list = []
-    data = pd.read_excel('Faculty.xlsx')
+    data = pd.read_excel(faculty_path)
     df = pd.DataFrame(data, columns=["Faculty","Position","Gender","Management","Area"])
     file = open("pid.txt","r")
     pid_list = file.readlines()
@@ -299,8 +299,8 @@ def degree_histogram_loglog(G):
 # G = nx.Graph(node_dict)
 
 
-def init_collab():
-    node_dict = get_coworker_dict()
+def init_collab(faculty_path):
+    node_dict = get_coworker_dict(faculty_path)
     G = nx.Graph(node_dict)
     nx.write_edgelist(G, "edge_list.txt", delimiter=' ', data=False) # Generate edge_list.txt
     
@@ -315,7 +315,7 @@ def init_collab_network():
         nx.write_edgelist(G, path+str(i) + "_edge_list.txt", delimiter=' ', data=False) # Generate edge_list.txt (yearly)
 
 
-def ret_collab_network(collab_type, pid):
+def ret_collab_network(collab_type, pid,faculty_path):
     fig_count = 0
     pid_real = pid.replace('_','/')
     print(pid_real)
@@ -355,22 +355,22 @@ def ret_collab_network(collab_type, pid):
                     G.add_node(n2)
                 
                 if rank_collab:
-                    n1 = find_pos_with_pid(a)
-                    n2 = find_pos_with_pid(b)
+                    n1 = find_pos_with_pid(a,faculty_path)
+                    n2 = find_pos_with_pid(b,faculty_path)
 
                     G.add_node(n1)
                     G.add_node(n2)
 
                 if man_collab:
-                    n1 = find_man_with_pid(a)
-                    n2 = find_man_with_pid(b)
+                    n1 = find_man_with_pid(a,faculty_path)
+                    n2 = find_man_with_pid(b,faculty_path)
                     
                     G.add_node(n1)
                     G.add_node(n2)
                 
                 if area_collab:
-                    n1 = find_area_with_pid(a)
-                    n2 = find_area_with_pid(b)
+                    n1 = find_area_with_pid(a,faculty_path)
+                    n2 = find_area_with_pid(b,faculty_path)
                     
                     G.add_node(n1)
                     G.add_node(n2)
@@ -401,9 +401,9 @@ def ret_collab_network(collab_type, pid):
 #Excellency and Centrality
 ########################################################
 #Function to return list of all Faculty class
-def get_faculty_list():
+def get_faculty_list(faculty_path):
     faculty_list = []
-    data = pd.read_excel('Faculty.xlsx')
+    data = pd.read_excel(faculty_path)
     df = pd.DataFrame(data, columns=["Faculty","Position","Gender","Management","Area"])
     file = open("pid.txt","r")
     pid_list = file.readlines()
@@ -415,8 +415,8 @@ def get_faculty_list():
 
 
 #Function to get pid: coworker Dictonary and create file 'Weighted_collab.txt'
-def get_coworker_dict_cent():
-    faculty_list = get_faculty_list()
+def get_coworker_dict_cent(faculty_path):
+    faculty_list = get_faculty_list(faculty_path)
     coauthor_dict = {}
     pid_strings = [faculty.pid for faculty in faculty_list]
     with open("weighted_collab.txt","w", encoding='utf-8') as f:

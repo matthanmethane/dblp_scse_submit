@@ -64,9 +64,9 @@ def init_file():
             except OSError as error: 
                 print(error)  
             load_faculty_xml(faculty_path)
-            init_collab()
+            init_collab(faculty_path)
             init_collab_network()
-            get_coworker_dict_cent()
+            get_coworker_dict_cent(faculty_path)
             messagebox.showinfo("Complete!","Initialization Finished! Go to Main to explore the Network of SCSE")
             return
     except Exception as e:
@@ -118,8 +118,8 @@ def collab():
         with open("edge_list.txt", "r") as f:
             for line in f:
                 a, b = line.split()
-                n1 = find_pos_with_pid(a)
-                n2 = find_pos_with_pid(b)
+                n1 = find_pos_with_pid(a,faculty_path)
+                n2 = find_pos_with_pid(b,faculty_path)
 
                 G.add_node(n1)
                 G.add_node(n2)
@@ -148,8 +148,8 @@ def collab():
         with open("edge_list.txt", "r") as f:
             for line in f:
                 a, b = line.split()
-                n1 = find_man_with_pid(a)
-                n2 = find_man_with_pid(b)
+                n1 = find_man_with_pid(a,faculty_path)
+                n2 = find_man_with_pid(b,faculty_path)
 
                 G.add_node(n1)
                 G.add_node(n2)
@@ -172,8 +172,8 @@ def collab():
         with open("edge_list.txt", "r") as f:
             for line in f:
                 a, b = line.split()
-                n1 = find_area_with_pid(a)
-                n2 = find_area_with_pid(b)
+                n1 = find_area_with_pid(a,faculty_path)
+                n2 = find_area_with_pid(b,faculty_path)
 
                 G.add_node(n1)
                 G.add_node(n2)
@@ -230,13 +230,13 @@ def collab_property():
     staff_choosen.pack(side='top')
     
     
-    num_collab_btn = tk.Button(collab_prop_gui,bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text ="Collaborative Property on Number of Collaboration", command = lambda: ret_collab_network("num_collab",pids[staffs.index(n.get())]))
+    num_collab_btn = tk.Button(collab_prop_gui,bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text ="Collaborative Property on Number of Collaboration", command = lambda: ret_collab_network("num_collab",pids[staffs.index(n.get())],faculty_path))
     num_collab_btn.pack(side='top')
-    rank_collab_btn = tk.Button(collab_prop_gui, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text ="Collaborative Property on Ranks", command = lambda: ret_collab_network("rank_collab",pids[staffs.index(n.get())]))
+    rank_collab_btn = tk.Button(collab_prop_gui, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text ="Collaborative Property on Ranks", command = lambda: ret_collab_network("rank_collab",pids[staffs.index(n.get())],faculty_path))
     rank_collab_btn.pack(side='top')
-    man_collab_btn = tk.Button(collab_prop_gui, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text ="Collaborative Property on Management Position", command = lambda: ret_collab_network("man_collab",pids[staffs.index(n.get())]))
+    man_collab_btn = tk.Button(collab_prop_gui, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text ="Collaborative Property on Management Position", command = lambda: ret_collab_network("man_collab",pids[staffs.index(n.get())],faculty_path))
     man_collab_btn.pack(side='top')
-    area_collab_btn = tk.Button(collab_prop_gui, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text ="Collaborative Property on Area", command = lambda: ret_collab_network("area_collab",pids[staffs.index(n.get())]))
+    area_collab_btn = tk.Button(collab_prop_gui, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text ="Collaborative Property on Area", command = lambda: ret_collab_network("area_collab",pids[staffs.index(n.get())],faculty_path))
     area_collab_btn.pack(side='top')
     tk.Button(collab_prop_gui, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text="Back", command = collab_prop_gui.destroy).pack(side='bottom')
 

@@ -47,8 +47,8 @@ def get_xml_link(faculty_path):
 #Download XML of individual's DBLP
 def load_faculty_xml(faculty_path):
     faculty_list = []
-    # data = pd.read_excel(faculty_path)
-    data = pd.read_excel('Faculty.xlsx')
+    data = pd.read_excel(faculty_path)
+    #data = pd.read_excel('Faculty.xlsx')
     print("Read Excel file...")
     df = pd.DataFrame(data, columns=["Faculty","Position","Gender","Management","Area"])
     with open("xml_link.txt","r") as xml_link:

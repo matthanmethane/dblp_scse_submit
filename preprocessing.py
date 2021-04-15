@@ -172,7 +172,7 @@ def find_name_with_pid(pid,faculty_path):
 def find_pos_with_pid(pid):
     pos_list = []
     data = pd.read_excel('Faculty.xlsx')
-    df =  df = pd.DataFrame(data, columns=["Faculty","Position","Gender","Management","Area"])
+    df = pd.DataFrame(data, columns=["Faculty","Position","Gender","Management","Area"])
     file = open("pid.txt","r")
     pid_list = file.readlines()
     pid_list_rstrip = [pid.replace("_",'/').rstrip() for pid in pid_list]
@@ -188,7 +188,7 @@ def find_pos_with_pid(pid):
 def find_man_with_pid(pid):
     man_list = []
     data = pd.read_excel('Faculty.xlsx')
-    df =  df = pd.DataFrame(data, columns=["Faculty","Position","Gender","Management","Area"])
+    df = pd.DataFrame(data, columns=["Faculty","Position","Gender","Management","Area"])
     file = open("pid.txt","r")
     pid_list = file.readlines()
     pid_list_rstrip = [pid.replace("_",'/').rstrip() for pid in pid_list]
@@ -204,7 +204,7 @@ def find_man_with_pid(pid):
 def find_area_with_pid(pid):
     area_list = []
     data = pd.read_excel('Faculty.xlsx')
-    df =  df = pd.DataFrame(data, columns=["Faculty","Position","Gender","Management","Area"])
+    df = pd.DataFrame(data, columns=["Faculty","Position","Gender","Management","Area"])
     file = open("pid.txt","r")
     pid_list = file.readlines()
     pid_list_rstrip = [pid.replace("_",'/').rstrip() for pid in pid_list]

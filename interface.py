@@ -125,7 +125,6 @@ def collab():
         A = nx.to_numpy_array(G, nodelist=nodes)
         sns.heatmap(A, annot=True, xticklabels=nodes, yticklabels=nodes,cmap="Blues")
         plt.show()
-        plt.savefig("rank_collab_heatmap.png")
         
         # Plot Network Graph
         pos = nx.spring_layout(G, seed=7)
@@ -133,7 +132,6 @@ def collab():
         nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
         nx.draw(G, pos, with_labels=True)
         plt.show()
-        plt.savefig("rank_collab_nwGraph.png")
 
     def management_collab(dummy):
         G = nx.Graph()
@@ -158,7 +156,6 @@ def collab():
         nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
         nx.draw(G, pos, with_labels=True)
         plt.show()
-        #plt.savefig("man_collab_nwGraph.png")
 
     def area_collab(dummy):
         G = nx.Graph()
@@ -183,7 +180,6 @@ def collab():
         A = nx.to_numpy_array(G, nodelist=nodes)
         sns.heatmap(A, annot=True, xticklabels=nodes, yticklabels=nodes,cmap="Blues")
         plt.show()
-        #plt.savefig("area_collab_heatmap.png")
 
         # Plot Network Graph
         pos = nx.spring_layout(G, seed=7)
@@ -194,7 +190,6 @@ def collab():
         sm = plt.cm.ScalarMappable(cmap=plt.cm.Blues, norm=plt.Normalize(vmin=4, vmax=13))
         plt.colorbar(sm)
         plt.show()
-        # plt.savefig("area_collab_nwGraph.png")
 
     #Buttons for collaboration
     rank_collab_btn = tk.Button(collab_gui, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text ="Network on Collaboration Between Ranks", command = lambda: rank_collab("dummy"))
@@ -225,13 +220,13 @@ def collab_property():
     staff_choosen.pack(side='top')
     
     
-    num_collab_btn = tk.Button(collab_prop_gui,bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text ="Collaborative Property on Number of Collaboration", command = lambda: ret_collab_network("num_collab",pids[staffs.index(n.get())] ))
+    num_collab_btn = tk.Button(collab_prop_gui,bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text ="Collaborative Property on Number of Collaboration", command = lambda: ret_collab_network("num_collab",pids[staffs.index(n.get())]))
     num_collab_btn.pack(side='top')
-    rank_collab_btn = tk.Button(collab_prop_gui, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text ="Collaborative Property on Ranks", command = lambda: ret_collab_network("rank_collab"))
+    rank_collab_btn = tk.Button(collab_prop_gui, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text ="Collaborative Property on Ranks", command = lambda: ret_collab_network("rank_collab",pids[staffs.index(n.get())]))
     rank_collab_btn.pack(side='top')
-    man_collab_btn = tk.Button(collab_prop_gui, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text ="Collaborative Property on Management Position", command = lambda: ret_collab_network("man_collab"))
+    man_collab_btn = tk.Button(collab_prop_gui, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text ="Collaborative Property on Management Position", command = lambda: ret_collab_network("man_collab",pids[staffs.index(n.get())]))
     man_collab_btn.pack(side='top')
-    area_collab_btn = tk.Button(collab_prop_gui, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text ="Collaborative Property on Area", command = lambda: ret_collab_network("area_collab"))
+    area_collab_btn = tk.Button(collab_prop_gui, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text ="Collaborative Property on Area", command = lambda: ret_collab_network("area_collab",pids[staffs.index(n.get())]))
     area_collab_btn.pack(side='top')
     tk.Button(collab_prop_gui, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text="Back", command = collab_prop_gui.destroy).pack(side='bottom')
 

@@ -79,9 +79,3 @@ def load_faculty_xml(faculty_path):
         faculty_list.append(faculty)
     
     return faculty_list
-
-load_faculty_xml("")
-    
-
-    
-

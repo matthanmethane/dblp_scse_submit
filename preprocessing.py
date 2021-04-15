@@ -47,7 +47,7 @@ def get_coworker_graph(nodes, year = 2021, mode = "all", weighted = True):
     if(mode=="connected"):
         isolates = list(nx.isolates(G))
         G.remove_nodes_from(isolates)
-    #use mode="giant" to choose giant component onlyl
+    #use mode="giant" to choose giant component only
     if(mode=="giant"):
         giant = G.subgraph(max(nx.connected_components(G), key=len))
         return giant
@@ -57,47 +57,47 @@ def get_properties(G):
     number_of_edges=G.number_of_edges()
     average_degree=number_of_edges/number_of_nodes
     average_clustering=nx.average_clustering(G)
-    print("number of nodes: n =", number_of_nodes)
-    print("number of edges: ∑k =", number_of_edges)
-    print("average degree: <k> =", average_degree)
-    print("average clustering coefficient: <C> =", average_clustering)
-    print("diameter: d = ", end="")
+    #print("number of nodes: n =", number_of_nodes)
+    #print("number of edges: ∑k =", number_of_edges)
+    #print("average degree: <k> =", average_degree)
+    #print("average clustering coefficient: <C> =", average_clustering)
+    #print("diameter: d = ", end="")
     try: 
         diameter=nx.diameter(G)
-        print(diameter)
+        #print(diameter)
     except (nx.exception.NetworkXError):
-        diameter = "NA"
-        print("The graph is not connected")
-    print("average distance: <d> = ", end="")
+        diameter = None
+        #print("The graph is not connected")
+    #print("average distance: <d> = ", end="")
     try: 
         average_distance = nx.average_shortest_path_length(G)
-        print(average_distance)
+        #print(average_distance)
     except (nx.exception.NetworkXError):
-        average_distance = "NA"
-        print("The graph is not connected")
+        average_distance = None
+        #print("The graph is not connected")
 
         
     degree_centrality = nx.degree_centrality(G)
     highest_degree_centrality_pid = max(degree_centrality, key=degree_centrality.get)
     highest_degree_centrality_value = degree_centrality.get(highest_degree_centrality_pid)
-    print("highest degree centrality:", highest_degree_centrality_pid, highest_degree_centrality_value)
+    #print("highest degree centrality:", highest_degree_centrality_pid, highest_degree_centrality_value)
     
     #default using max_iter = 100, tolerance=10^-6
     #eigen_centrality = nx.eigenvector_centrality_numpy(G)
     eigen_centrality = nx.eigenvector_centrality(G)
     highest_eigen_centrality_pid = max(eigen_centrality, key=eigen_centrality.get)
     highest_eigen_centrality_value = eigen_centrality.get(highest_eigen_centrality_pid)
-    print("highest eigen centrality:", highest_eigen_centrality_pid, highest_eigen_centrality_value)
+    #print("highest eigen centrality:", highest_eigen_centrality_pid, highest_eigen_centrality_value)
     
     closeness_centrality = nx.closeness_centrality(G)
     highest_closeness_centrality_pid = max(closeness_centrality, key=closeness_centrality.get)
     highest_closeness_centrality_value = closeness_centrality.get(highest_closeness_centrality_pid)
-    print("highest closeness centrality:", highest_closeness_centrality_pid, highest_closeness_centrality_value)
+    #print("highest closeness centrality:", highest_closeness_centrality_pid, highest_closeness_centrality_value)
     
     betweenness_centrality = nx.betweenness_centrality(G)
     highest_betweenness_centrality_pid = max(betweenness_centrality, key=betweenness_centrality.get)
     highest_betweenness_centrality_value = betweenness_centrality.get(highest_betweenness_centrality_pid)
-    print("highest betweenness centrality:", highest_betweenness_centrality_pid, highest_betweenness_centrality_value)
+    #print("highest betweenness centrality:", highest_betweenness_centrality_pid, highest_betweenness_centrality_value)
     
     #return a list of network properties
     result = []
@@ -112,12 +112,12 @@ def ret_graph_network_year(yr_input=2021, mode_input ="connected",weighted_bool 
     #get_properties(G)
 
 #return properties dataframe
-def get_properties_yearly(nodes,year=2000):
+def get_properties_yearly(nodes,year=2000, mode_input="all"):
     with contextlib.redirect_stdout(None):
         result_dict = {"Year":[],"nodes":[],"edges":[],"average_degree":[],"average_clustering":[],"diameter":[],"average_distance":[],"highest_degree_centrality_pid":[],"highest_degree_centrality_value":[],"highest_eigen_centrality_pid":[],"highest_eigen_centrality_value":[],"highest_closeness_centrality_pid":[],"highest_closeness_centrality_value":[],"highest_betweenness_centrality_pid":[],"highest_betweenness_centrality_value":[]}
         dict_keys=["Year","nodes","edges","average_degree","average_clustering","diameter","average_distance","highest_degree_centrality_pid","highest_degree_centrality_value","highest_eigen_centrality_pid","highest_eigen_centrality_value","highest_closeness_centrality_pid","highest_closeness_centrality_value","highest_betweenness_centrality_pid","highest_betweenness_centrality_value"]
         for i in range(int(time.strftime("%Y")),year-1,-1):
-            G = get_coworker_graph(nodes, year = i, mode = "giant")
+            G = get_coworker_graph(nodes, year = i, mode = mode_input)
             result = get_properties(G)
             result.insert(0,i) 
             for i in range(len(result)):
@@ -144,6 +144,8 @@ def yearly_diff(df,N=1):
         for i in lag_cols:
             df[bar(i)]=df[i]-df[foo(i)]
             df.drop(foo(i), axis=1, inplace=True)
+        df = df.astype({bar('nodes'):pd.Int64Dtype()})
+        df = df.astype({bar('edges'):pd.Int64Dtype()})
     del df_shift
     return df 
 

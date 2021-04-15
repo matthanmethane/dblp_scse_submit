@@ -151,6 +151,9 @@ def ret_nodes():
     file.close()
     return pid_list_rstrip
 
+
+
+
 #Collaboration
 ############################################################################
 def find_name_with_pid(pid,faculty_path):
@@ -259,7 +262,7 @@ def degree_histogram(G):
     plt.bar(deg, cnt, width=0.80, color="b")
 
     plt.title("Degree Histogram")
-    plt.ylabel("Count")
+    plt.ylabel("Probability")
     plt.xlabel("Degree")
     ax.set_xticks([d + 0.4 for d in deg])
     ax.set_xticklabels(deg)
@@ -286,7 +289,9 @@ def degree_histogram_loglog(G):
             continue
     deg, cnt = zip(*degreeCountLog.items())
     plt.scatter(deg,cnt)
-
+    plt.title("log-log Degree Histogram")
+    plt.ylabel("log Probability")
+    plt.xlabel("log Degree")
     plt.show()
 
 # node_dict = get_coworker_dict()
@@ -437,11 +442,13 @@ def get_coworker_dict_cent():
     return(coauthor_dict)
 
 def ret_graph_cent():  
+    G = nx.Graph()
     try:
         with open("weighted_collab.txt","r", encoding='utf-8') as f:
             G = nx.read_weighted_edgelist(f)
-    except:
-        G = ""
+    except Exception as e:
+        print(e)
+        return G
     return G
 
 
@@ -620,3 +627,5 @@ def centrality_top_venue_scatter(G, cen_type):
     
 
 ########################################################
+
+

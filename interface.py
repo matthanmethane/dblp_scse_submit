@@ -254,10 +254,10 @@ def excellency():
             draw_heatmap(G,nx.betweenness_centrality(G),"Betweenness Centrality")
 
     def open_cent_dataframe(dummy):
-        df = centrality_top_venue_dataframe(G)
+        df = centrality_top_venue_dataframe(G,faculty_path)
         show(df)
     def open_scatter(cen_type):
-        centrality_top_venue_scatter(G,cen_type)
+        centrality_top_venue_scatter(G,cen_type,faculty_path)
 
     degree_cen_btn = tk.Button(excellency_gui, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text ="Degree Centrality Heatmap Network", command = lambda: open_centrality("degree"))
     eigenvector_cen_btn = tk.Button(excellency_gui, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text ="Eigenvector Centrality Heatmap Network", command = lambda: open_centrality("eigenvector"))
@@ -280,6 +280,12 @@ def recommend():
 
 def loadMain():
     global main
+    try:
+        faculty_path
+        top_path
+    except:
+        messagebox.showerror("File Error!","Please load both Faculty.xlsx and Top.xlsx")
+        return
     MsgBox = tk.messagebox.askquestion ('Go to main','Are you sure you initialized the files?',icon = 'warning')
     if MsgBox == 'yes':
         main= Toplevel(window)

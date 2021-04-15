@@ -453,8 +453,8 @@ def ret_graph_cent():
 
 
 #Function to get pid: Area Dictionary
-def get_area_dict():
-    faculty_list = get_faculty_list()
+def get_area_dict(faculty_path):
+    faculty_list = get_faculty_list(faculty_path)
     
     area_dict = {}
     for faculty in faculty_list:
@@ -539,7 +539,7 @@ def centrality_to_dataframe(G, cen_type="all"):
         return None
 
 #Function to get DataFrame of Professor and number of Publications in the Top Venues
-def no_top_venue_dataframe():
+def no_top_venue_dataframe(faculty_path):
     VENUE_DICT = {
         "Data Management" : "sigmod",
         "Data Mining" : "kdd",
@@ -574,8 +574,8 @@ def no_top_venue_dataframe():
         "mm" : "ACM Multimedia",
     }
 
-    faculty_list = get_faculty_list()
-    area_list = get_area_dict()
+    faculty_list = get_faculty_list(faculty_path)
+    area_list = get_area_dict(faculty_path)
 
     #TODO: The venues should match with the professor's respective subject
     faculty_venue_dict = {}
@@ -610,15 +610,15 @@ def no_top_venue_dataframe():
     return sorted_df
 
 #Function to return dataframe of all centralities and number of pulications in top venue
-def centrality_top_venue_dataframe(G):
+def centrality_top_venue_dataframe(G,faculty_path):
     df_centrality = centrality_to_dataframe(G)
-    df_top_venue = no_top_venue_dataframe()
+    df_top_venue = no_top_venue_dataframe(faculty_path)
     df_centrality["No.Publication in Top Venue"] = df_top_venue["No.Publication in Top Venue"]
-    df_centrality = df_centrality.rename(index = lambda x: find_name_with_pid(x))
+    df_centrality = df_centrality.rename(index = lambda x: find_name_with_pid(x,faculty_path))
     return(df_centrality)
 #Function to show graph between centrality and number of pulications in top venue
-def centrality_top_venue_scatter(G, cen_type):
-    df = centrality_top_venue_dataframe(G)
+def centrality_top_venue_scatter(G, cen_type,faculty_path):
+    df = centrality_top_venue_dataframe(G,faculty_path)
     plt.scatter(df[f'{cen_type} Centrality'], df['No.Publication in Top Venue'])
     plt.title(f"{cen_type} Centrality VS No. Publication")
     plt.xlabel(f"{cen_type} Centrality")

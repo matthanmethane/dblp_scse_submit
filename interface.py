@@ -8,12 +8,14 @@ import matplotlib.colors as mcolors
 import networkx as nx
 import numpy as np
 import seaborn as sns
-from preprocessing import degree_histogram_loglog,degree_histogram,find_name_with_pid,init_collab_network,ret_collab_network,ret_graph_network_year, ret_nodes,get_properties_yearly, yearly_diff,init_collab, find_pos_with_pid, find_area_with_pid, find_name_with_pid, find_man_with_pid, ret_graph_cent,get_coworker_dict_cent, draw_heatmap, centrality_top_venue_dataframe, centrality_top_venue_scatter
+from preprocessing import draw_graph,show_new_members,get_total_number,graph_Qn7,get_dict_of_field,get_dict_of_edges,degree_histogram_loglog,degree_histogram,find_name_with_pid,init_collab_network,ret_collab_network,ret_graph_network_year, ret_nodes,get_properties_yearly, yearly_diff,init_collab, find_pos_with_pid, find_area_with_pid, find_name_with_pid, find_man_with_pid, ret_graph_cent,get_coworker_dict_cent, draw_heatmap, centrality_top_venue_dataframe, centrality_top_venue_scatter
 from faculty import load_faculty_xml, get_xml_link
 from pandasgui import show
 import threading
 import time
 import os
+import itertools
+import operator
 WINDOW_SIZE = "300x900"
 BTN_WIDTH = "300"
 BTN_HEIGHT = "10"
@@ -276,8 +278,25 @@ def excellency():
 #TODO: Put your faculty recommendation functions here
 def recommend():
     recommend = Toplevel(main)
+    recommend.geometry(WINDOW_SIZE)
+    dictOfEdges = get_dict_of_edges(faculty_path)
+    dictOfField = get_dict_of_field(faculty_path)
+    G = graph_Qn7(dictOfEdges)
+    def show_network(dummy):
+        draw_graph(G)
+    def show_number(dummy):
+        df = get_total_number(dictOfField,dictOfEdges)
+        show(df)
+    def show_member_list(dummy):
+        df = show_new_members(G,dictOfField,faculty_path)
+        show(df)
+    tk.Button(recommend, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text="Show network after addition of Staff", command = lambda: show_network("dummy")).pack(side='top')
+    tk.Button(recommend, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text="Show Statistical Change after addition", command = lambda:show_number("dummy")).pack(side='top')
+    tk.Button(recommend, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text="Show New Faculty List", command = lambda:show_member_list("dummy")).pack(side='top')
+    
+    tk.Button(recommend, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text="Back", command = recommend.destroy).pack(side='bottom')
 
-
+######################################################################################
 def loadMain():
     global main
     try:
@@ -294,7 +313,7 @@ def loadMain():
         tk.Button(main, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text="Collaboration", command = collab).pack(side='top')
         tk.Button(main, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text="Excellency", command = excellency).pack(side='top')
         tk.Button(main, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text="New Faculty Recommendation", command = recommend).pack(side='top')
-        tk.Button(main, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text="Exit", command = main.destroy).pack(side='bottom')
+        tk.Button(main, bg=BG_COLOR,height = BTN_HEIGHT, width = BTN_WIDTH,text="Back", command = main.destroy).pack(side='bottom')
     
 
 

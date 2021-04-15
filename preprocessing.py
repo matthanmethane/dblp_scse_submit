@@ -9,6 +9,9 @@ import matplotlib.colors as mcolors
 import collections
 import time
 import contextlib
+import itertools
+import operator
+import xml.etree.ElementTree as ET
 
 
 #Network Property
@@ -628,4 +631,273 @@ def centrality_top_venue_scatter(G, cen_type,faculty_path):
 
 ########################################################
 
+def find_all_coauthors(faculty_path):
+    faculty_list = []
+    data = pd.read_excel(faculty_path)
+    df = pd.DataFrame(data, columns=["Faculty","Position","Gender","Management","Area"])
+    file = open("pid.txt","r")
+    pid_list = file.readlines()
+    pid_list_rstrip = [pid.replace("_",'/').rstrip() for pid in pid_list]
+    for idx, df_line in df.iterrows():
+        faculty = Faculty(df_line["Faculty"],pid_list_rstrip[idx],df_line["Position"],df_line["Gender"],df_line["Management"],df_line["Area"])
+        faculty_list.append(faculty)
+        
+    coauthor_dict = {}
+    pid_strings = [faculty.pid for faculty in faculty_list]
+    for pid_string in pid_strings:
+        xmlDoc = open(f'faculty_xml/{pid_string.replace("/","_")}.xml','r',encoding='utf-8')
+        xmlDocData = xmlDoc.read()
+        xmlDocTree = ET.XML(xmlDocData)
+                      
+        coauthor_pid_list = []
+                      
+        for CA in xmlDocTree.iter('author'):
+            
+            if CA.attrib['pid'] not in pid_list_rstrip:     #not in NTU
+                coauthor_pid_list.append(CA.attrib['pid'])         #repetition allowed for the question
+        xmlDoc.close()             
+        coauthor_dict[pid_string] = coauthor_pid_list
+        
+                      
+    return(coauthor_dict)
 
+
+
+
+
+def name_with_pid(faculty_path):
+    faculty_list = []
+    data = pd.read_excel(faculty_path)
+    df = pd.DataFrame(data, columns=["Faculty","Position","Gender","Management","Area"])
+    file = open("pid.txt","r")
+    pid_list = file.readlines()
+    pid_list_rstrip = [pid.replace("_",'/').rstrip() for pid in pid_list]
+    for idx, df_line in df.iterrows():
+        faculty = Faculty(df_line["Faculty"],pid_list_rstrip[idx],df_line["Position"],df_line["Gender"],df_line["Management"],df_line["Area"])
+        faculty_list.append(faculty)
+        
+    coauthor_dict = {}
+    pid_strings = [faculty.pid for faculty in faculty_list]
+    for pid_string in pid_strings:
+        xmlDoc = open(f'faculty_xml/{pid_string.replace("/","_")}.xml','r',encoding='utf-8')
+        xmlDocData = xmlDoc.read()
+        xmlDocTree = ET.XML(xmlDocData)
+                      
+        coauthor_name_with_pid = []
+        temp = []            
+        for CA in xmlDocTree.iter('author'):
+            
+            if CA.attrib['pid'] not in pid_list_rstrip:     #not in NTU
+                temp = [CA.attrib['pid'],CA.text]
+                coauthor_name_with_pid.append(temp)   
+                temp=[]                                 #repetition allowed for the question
+        xmlDoc.close()
+        coauthor_dict[pid_string] =  coauthor_name_with_pid
+    ll=[]
+    for g in coauthor_dict:
+        for i in coauthor_dict[g]:
+            if i not in ll:
+                ll.append(i)
+    df = pd.DataFrame(ll)
+    return ll
+        
+                      
+
+
+def keys_return(faculty_path):
+    faculty_list = []
+    data = pd.read_excel(faculty_path)
+    df = pd.DataFrame(data, columns=["Faculty","Position","Gender","Management","Area"])
+    file = open("pid.txt","r")
+    pid_list = file.readlines()
+    pid_list_rstrip = [pid.replace("_",'/').rstrip() for pid in pid_list]
+    return pid_list_rstrip
+
+
+########################################################
+def get_dict_of_edges(faculty_path):
+    
+    dictForAllCoAuthors = find_all_coauthors(faculty_path)    
+    listForEligible = []
+    dictOfEdges = {}
+    x=0
+    keylist = keys_return(faculty_path)
+    for i in range(len(keylist)):
+        tempList = []
+        for j in range(len(dictForAllCoAuthors[keylist[i]])):
+            tempPid = (dictForAllCoAuthors[keylist[i]][j])
+            count = 0
+            for h in range(len(dictForAllCoAuthors[keylist[i]])):
+                if tempPid == dictForAllCoAuthors[keylist[i]][h]:
+                    count = count + 1
+            if count > 4 and tempPid not in listForEligible:   # count > 4 in order to account for the repeat.
+                listForEligible.append(tempPid)
+                tempList.append(tempPid)
+        dictOfEdges[keylist[i]] = tempList            
+    
+    return dictOfEdges
+
+
+def graph_Qn7(dictOfEdges):
+    G = nx.Graph(dictOfEdges)
+    return G
+
+def draw_graph(G):
+        d = dict(G.degree)
+        color_map = []
+        for node in G:
+            if len(G.edges(node))<1:
+                color_map.append('blue')
+            elif len(G.edges(node)) > 1 and len(G.edges(node))< 10:
+                color_map.append('green')
+            elif len(G.edges(node)) > 10 and len(G.edges(node)) < 20:
+                color_map.append('yellow')
+            else: 
+                color_map.append('red')      
+        nx.draw(G, node_size = 10,node_color=color_map, with_labels=False)
+        plt.show()
+def get_graph_sorted_degree(G):
+    result=[]
+    degree_dict = dict(G.degree(G.nodes()))
+    nx.set_node_attributes(G, degree_dict, 'degree')
+    sorted_degree = sorted(degree_dict.items(), key=operator.itemgetter(1), reverse=True)
+    print("Top 20 nodes by degree:")
+    for d in sorted_degree[:20]:
+        print(d)
+        result.append(d)
+    return result
+
+def get_graph_degree_cen(G):
+    result=[]
+    degree_cen_dict = nx.degree_centrality(G) # run degree centrality
+    nx.set_node_attributes(G, degree_cen_dict , 'degree')
+    
+    sorted_degreeC = sorted(degree_cen_dict.items(), key=operator.itemgetter(1), reverse=True)
+    df0= pd.DataFrame(sorted_degreeC)
+    df0.columns = ['Nodes','Degree Centrality']
+    print("Top 20 nodes by degree centrality:")
+    for b in sorted_degreeC[:20]:
+        print(b)
+        result.append(b)
+    return result
+
+def get_graph_betweeness(G):
+    result=[]
+    betweenness_dict = nx.betweenness_centrality(G) # run betweenness centrality
+    nx.set_node_attributes(G, betweenness_dict, 'betweenness')
+    sorted_betweenness = sorted(betweenness_dict.items(), key=operator.itemgetter(1), reverse=True)
+    print("Top 20 nodes by betweenness centrality:")
+    df1= pd.DataFrame(sorted_betweenness)
+    df1.columns = ['Nodes','Betweeness Centrality']
+    for b in sorted_betweenness[:20]:
+        print(b)
+        result.append(b)
+    return result
+
+
+def get_graph_eigen(G):
+    result=[]
+    eigenvector_dict = nx.eigenvector_centrality(G) # run eigenvector centrality
+    nx.set_node_attributes(G, eigenvector_dict, 'eigenvector')
+    sorted_eigenvector = sorted(eigenvector_dict.items(), key=operator.itemgetter(1), reverse=True)
+    df2=pd.DataFrame(sorted_eigenvector)
+    df2.columns = ['Nodes','Eigenvector Centrality']
+    print("Top 20 nodes by eigenvector centrality:")
+    for b in sorted_eigenvector[:20]:
+        print(b)
+        result.append(b)
+    return result
+
+
+
+
+def get_dict_of_field(faculty_path):
+    data = pd.read_excel(faculty_path)
+    df = pd.DataFrame(data, columns=["Faculty","Position","Gender","Management","Area"])
+    file = open("pid.txt",'r')
+    pidlist = []
+    for lines in file.readlines():
+        pidlist.append(lines.strip('\n'))
+    df['pid'] = pidlist
+
+
+    df1 = df[['Area', "pid"]]
+
+
+    g= list(df1['pid'])
+    words = [w.replace('_', '/') for w in g]
+
+    df1.drop(columns = 'pid')
+    df1['pida']= words
+
+    cyberSec = []
+    ai_ml = []
+    comVision = []
+    comArc = []
+    multiM=[]
+    comNet = []
+    distSys = []
+    bioM=[]
+    ir = []
+    listOfField=[]
+    for area in df1['Area']:
+        if area not in listOfField:
+            listOfField.append(area)
+
+    dictOfField = {}
+    for i in listOfField:
+        listm=[]
+        for ind in df1.index:
+            if(str(df1['Area'][ind]) == str(i)):
+                listm.append(df1['pida'][ind])
+        dictOfField[i] =listm
+        
+    return dictOfField  
+
+def get_total_number(dictOfField,dictOfEdges):
+    noDict ={}
+    for keys in dictOfField:
+        noDict[keys]= len(dictOfField[keys])
+
+
+    dictA ={}
+    for s in dictOfEdges:
+        dictA[s]=len(dictOfEdges[s])
+
+
+    newDict =dictOfField
+    finalD={}
+    for s in newDict:
+        og = 0
+       
+        for i in dictA:
+            
+            for m in range(len(newDict[s])):
+                
+                if str(i) == str(newDict[s][m]):
+                    finalD[s] = og + dictA[i]
+                    og = og + dictA[i]
+    data = finalD
+    dfTotal = pd.DataFrame.from_dict(data,orient='index',columns=['Total New Members'])
+    
+    return dfTotal                
+
+
+def show_new_members(G,dictOfField,faculty_path):
+    LL = name_with_pid(faculty_path)
+    df_edge = nx.to_pandas_edgelist(G)
+    for index, row in df_edge.iterrows():
+        for i in LL:
+            if str(row[1]) == str(i[0]):
+                row[1] = i[1]
+    for index, row in df_edge.iterrows():
+        for i in dictOfField:
+            for g in dictOfField[i]:
+          
+                if str(row[0]) == str(g):
+                
+                    row[0] = str(i)
+            
+    df_edges = df_edge.rename(columns={'source': 'Department','target':'Name'})
+    
+    return df_edges
